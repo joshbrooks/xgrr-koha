@@ -1,0 +1,47 @@
+version: '2'
+services:
+
+  mysql:
+    image: mariadb
+    command: mysqld_safe
+    restart: always
+    volumes:
+      - kohadb:/var/lib/mysql
+      - ./library:/docker-entrypoint-initdb.d
+    environment:
+      MYSQL_ROOT_PASSWORD: secret
+      MYSQL_DATABASE: koha_library
+      MYSQL_USER: xgcc
+      MYSQL_PASSWORD: secret
+    command: ["mysqld"]
+
+  cache:
+    image: memcached
+    command: ["memcached", "-m", "128"]
+    
+  koha:
+    build: .
+    restart: always
+    ports:
+      - "8088:80"
+      - "8089:8080"
+    links:
+      - mysql
+      - cache
+    cap_add:
+      - SYS_NICE
+      - DAC_READ_SEARCH
+    volumes:
+      - dbbackup:/var/spool/koha
+      - ./library:/library
+    environment:
+      server: mysql
+      name: library
+      user: xgcc
+      pass: secret
+      MEMCACHED_SERVERS: cache:11211
+
+volumes:
+  initdb:
+  kohadb:
+  dbbackup:

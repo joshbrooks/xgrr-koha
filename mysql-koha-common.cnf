@@ -1,0 +1,12 @@
+[client]
+host     = mysql
+user     = xgcc
+password = secret
+socket   = 3306
+[mysql_upgrade]
+host     = mysql
+user     = xgcc
+password = secret
+socket   = 3306
+basedir  = /usr
+
